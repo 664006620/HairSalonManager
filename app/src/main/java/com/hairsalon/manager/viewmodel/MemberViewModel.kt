@@ -8,6 +8,7 @@ import com.hairsalon.manager.data.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.*
+import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -238,7 +239,8 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun getChineseInitial(c: Char): String {
         return try {
-            val bytes = c.toString().toByteArray(Charset.forName("GBK"))
+            val gbkCharset = Charset.forName("GBK")
+            val bytes = c.toString().toByteArray(gbkCharset)
             if (bytes.size == 2) {
                 val high = bytes[0].toInt() and 0xFF
                 val low = bytes[1].toInt() and 0xFF
