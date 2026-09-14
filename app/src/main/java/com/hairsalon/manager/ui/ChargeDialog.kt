@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.hairsalon.manager.data.Member
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChargeDialog(
     title: String,
@@ -32,7 +33,6 @@ fun ChargeDialog(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 快捷金额
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -95,6 +95,7 @@ fun ChargeDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditMemberDialog(
     member: Member,
@@ -138,8 +139,8 @@ fun EditMemberDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 等级选择
                 Text("会员等级", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -148,7 +149,7 @@ fun EditMemberDialog(
                         FilterChip(
                             selected = level == l,
                             onClick = { level = l },
-                            label = { Text(l, fontSize = MaterialTheme.typography.labelSmall.fontSize) },
+                            label = { Text(l) },
                             modifier = Modifier.height(28.dp)
                         )
                     }
