@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 剪刀图案 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30 L44,50 L54,70 L64,50 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,50 m-8,0 a8,8 0,1 1,16 0 a8,8 0,1 1,-16 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,50 m-8,0 a8,8 0,1 1,16 0 a8,8 0,1 1,-16 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30 L50,22 L54,26 L58,22 Z" />
+</vector>
