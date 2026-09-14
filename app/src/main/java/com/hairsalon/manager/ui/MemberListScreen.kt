@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.hairsalon.manager.data.Member
 import com.hairsalon.manager.viewmodel.MemberViewModel
 
-val LETTERS = listOf("全部", "A","B","C","D","E","F","G","H","I","J","K","L","M",
+val LETTERS = listOf("全部","A","B","C","D","E","F","G","H","I","J","K","L","M",
     "N","O","P","Q","R","S","T","U","V","W","X","Y","Z","#")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +35,6 @@ fun MemberListScreen(
     val searchResults by viewModel.searchResults.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var selectedLetter by remember { mutableStateOf("全部") }
-    var showAddDialog by remember { mutableStateOf(false) }
 
     val displayList = if (searchQuery.isNotEmpty()) searchResults
     else if (selectedLetter != "全部") searchResults
@@ -68,7 +67,6 @@ fun MemberListScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            // 搜索栏
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
@@ -82,7 +80,10 @@ fun MemberListScreen(
                 leadingIcon = { Icon(Icons.Default.Search, null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { searchQuery = ""; viewModel.searchByKeyword("") }) {
+                        IconButton(onClick = {
+                            searchQuery = ""
+                            viewModel.searchByKeyword("")
+                        }) {
                             Icon(Icons.Default.Clear, "清除")
                         }
                     }
@@ -91,7 +92,6 @@ fun MemberListScreen(
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // 字母快速导航
             LazyRow(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -115,7 +115,6 @@ fun MemberListScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 会员列表
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -144,7 +143,6 @@ fun MemberCard(member: Member, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 头像占位
             Surface(
                 modifier = Modifier.size(48.dp),
                 shape = RoundedCornerShape(24.dp),
