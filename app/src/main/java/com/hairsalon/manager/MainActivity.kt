@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hairsalon.manager.ui.*
 import com.hairsalon.manager.ui.theme.HairSalonTheme
@@ -28,14 +29,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(viewModel: MemberViewModel = viewModel()) {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.List) }
+    var showDetail by remember { mutableStateOf(false) }
     var selectedMemberId by remember { mutableStateOf(0L) }
     var showAddDialog by remember { mutableStateOf(false) }
     var showImportExport by remember { mutableStateOf(false) }
 
     val message by viewModel.message.collectAsState()
 
-    // 文件选择器
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -54,7 +54,6 @@ fun MainApp(viewModel: MemberViewModel = viewModel()) {
         uri?.let { viewModel.exportMembersToTxt(it) }
     }
 
-    // Snackbar 消息提示
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(message) {
         if (message.isNotEmpty()) {
@@ -67,31 +66,27 @@ fun MainApp(viewModel: MemberViewModel = viewModel()) {
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            when (currentScreen) {
-                is Screen.List -> {
-                    MemberListScreen(
-                        viewModel = viewModel,
-                        onMemberClick = { id ->
-                            selectedMemberId = id
-                            currentScreen = Screen.Detail
-                        },
-                        onAddClick = { showAddDialog = true },
-                        onImportClick = { showImportExport = true },
-                        onExportClick = { showImportExport = true }
-                    )
-                }
-                is Screen.Detail -> {
-                    MemberDetailScreen(
-                        viewModel = viewModel,
-                        memberId = selectedMemberId,
-                        onBack = { currentScreen = Screen.List }
-                    )
-                }
+            if (showDetail) {
+                MemberDetailScreen(
+                    viewModel = viewModel,
+                    memberId = selectedMemberId,
+                    onBack = { showDetail = false }
+                )
+            } else {
+                MemberListScreen(
+                    viewModel = viewModel,
+                    onMemberClick = { id ->
+                        selectedMemberId = id
+                        showDetail = true
+                    },
+                    onAddClick = { showAddDialog = true },
+                    onImportClick = { showImportExport = true },
+                    onExportClick = { showImportExport = true }
+                )
             }
         }
     }
 
-    // 添加会员对话框
     if (showAddDialog) {
         AddMemberDialog(
             onConfirm = { name, phone, level, remark ->
@@ -102,7 +97,6 @@ fun MainApp(viewModel: MemberViewModel = viewModel()) {
         )
     }
 
-    // 导入导出对话框
     if (showImportExport) {
         ImportExportDialog(
             onImport = {
@@ -122,11 +116,6 @@ fun MainApp(viewModel: MemberViewModel = viewModel()) {
     }
 }
 
-sealed class Screen {
-    object List : Screen()
-    object Detail : Screen()
-}
-
 @Composable
 fun ImportExportDialog(
     onImport: () -> Unit,
@@ -134,20 +123,6 @@ fun ImportExportDialog(
     onExportTxt: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("数据管理") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("导入格式: 姓名,电话,余额,等级 (每行一条)")
-                Text("示例: 张三,13800138000,500,金卡会员")
-            }
-        },
-        confirmButton = {},
-        dismissButton = {}
-    )
-
-    // 使用自定义对话框以获得更好的按钮布局
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -165,7 +140,9 @@ fun ImportExportDialog(
 
                 Button(
                     onClick = onImport,
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
                 ) {
                     Text("📥 导入TXT文件")
                 }
@@ -173,7 +150,9 @@ fun ImportExportDialog(
 
                 OutlinedButton(
                     onClick = onExportDb,
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
                 ) {
                     Text("💾 导出数据库文件")
                 }
@@ -181,7 +160,9 @@ fun ImportExportDialog(
 
                 OutlinedButton(
                     onClick = onExportTxt,
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
                 ) {
                     Text("📄 导出会员列表(TXT)")
                 }
