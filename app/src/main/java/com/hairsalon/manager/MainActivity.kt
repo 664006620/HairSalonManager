@@ -3,6 +3,7 @@ package com.hairsalon.manager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -37,21 +38,27 @@ fun MainApp(viewModel: MemberViewModel = viewModel()) {
     val message by viewModel.message.collectAsState()
 
     val importLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
-        uri?.let { viewModel.importFromTxt(it) }
+        if (uri != null) {
+            viewModel.importFromTxt(uri)
+        }
     }
 
     val exportDbLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/octet-stream")
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
-        uri?.let { viewModel.exportDatabase(it) }
+        if (uri != null) {
+            viewModel.exportDatabase(uri)
+        }
     }
 
     val exportTxtLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("text/plain")
+        contract = ActivityResultContracts.CreateDocument("text/plain")
     ) { uri ->
-        uri?.let { viewModel.exportMembersToTxt(it) }
+        if (uri != null) {
+            viewModel.exportMembersToTxt(uri)
+        }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
