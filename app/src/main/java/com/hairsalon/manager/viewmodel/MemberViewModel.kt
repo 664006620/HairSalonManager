@@ -152,13 +152,14 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
                 val inputStream = context.contentResolver.openInputStream(uri)
                 val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
                 var count = 0
-                reader.forEachLine { line ->
+                var line = reader.readLine()
+                while (line != null) {
                     val parts = line.split(",", "\t", "|")
-                    if (parts.size >= 2) {
+                    if (parts.size >= 1) {
                         val name = parts[0].trim()
-                        val phone = parts.getOrNull(1)?.trim() ?: ""
-                        val balance = parts.getOrNull(2)?.trim()?.toDoubleOrNull() ?: 0.0
-                        val level = parts.getOrNull(3)?.trim() ?: "普通会员"
+                        val phone = if (parts.size > 1) parts[1].trim() else ""
+                        val balance = if (parts.size > 2) parts[2].trim().toDoubleOrNull() ?: 0.0 else 0.0
+                        val level = if (parts.size > 3) parts[3].trim() else "普通会员"
                         if (name.isNotEmpty()) {
                             dao.insertMember(
                                 Member(
@@ -172,6 +173,7 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
                             count++
                         }
                     }
+                    line = reader.readLine()
                 }
                 reader.close()
                 loadMembers()
@@ -224,7 +226,6 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
         _message.value = ""
     }
 
-    // 简易拼音首字母提取（支持常用汉字）
     private fun getPinyinInitial(name: String): String {
         if (name.isEmpty()) return "#"
         val first = name[0]
@@ -236,52 +237,41 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun getChineseInitial(c: Char): String {
-        // 基于 Unicode 区间的简易拼音首字母映射
-        val code = c.code
-        return when {
-            code in 0x4E00..0x4E8C -> "A"  // 简化处理
-            code in 0x5317..0x5317 -> "B"
-            code in 0x5F69..0x5F69 -> "C"
-            code in 0x5927..0x5927 -> "D"
-            else -> {
-                // 使用 GBK 编码范围进行更精确的映射
-                try {
-                    val bytes = c.toString().toByteArray(charset("GBK"))
-                    if (bytes.size == 2) {
-                        val high = bytes[0].toInt() and 0xFF
-                        val low = bytes[1].toInt() and 0xFF
-                        val code2 = high * 256 + low
-                        when {
-                            code2 >= 0xB0A1 && code2 <= 0xB0C4 -> "A"
-                            code2 >= 0xB0C5 && code2 <= 0xB2C0 -> "B"
-                            code2 >= 0xB2C1 && code2 <= 0xB4ED -> "C"
-                            code2 >= 0xB4EE && code2 <= 0xB6E9 -> "D"
-                            code2 >= 0xB6EA && code2 <= 0xB7A1 -> "E"
-                            code2 >= 0xB7A2 && code2 <= 0xB8C0 -> "F"
-                            code2 >= 0xB8C1 && code2 <= 0xB9FD -> "G"
-                            code2 >= 0xB9FE && code2 <= 0xBBF6 -> "H"
-                            code2 >= 0xBBF7 && code2 <= 0xBFA5 -> "J"
-                            code2 >= 0xBFA6 && code2 <= 0xC0AB -> "K"
-                            code2 >= 0xC0AC && code2 <= 0xC2E7 -> "L"
-                            code2 >= 0xC2E8 && code2 <= 0xC4C2 -> "M"
-                            code2 >= 0xC4C3 && code2 <= 0xC5B5 -> "N"
-                            code2 >= 0xC5B6 && code2 <= 0xC5BD -> "O"
-                            code2 >= 0xC5BE && code2 <= 0xC6D9 -> "P"
-                            code2 >= 0xC6DA && code2 <= 0xC8BA -> "Q"
-                            code2 >= 0xC8BB && code2 <= 0xC8F5 -> "R"
-                            code2 >= 0xC8F6 && code2 <= 0xCBF9 -> "S"
-                            code2 >= 0xCBFA && code2 <= 0xCDD9 -> "T"
-                            code2 >= 0xCDDA && code2 <= 0xCEF3 -> "W"
-                            code2 >= 0xCEF4 && code2 <= 0xD1B8 -> "X"
-                            code2 >= 0xD1B9 && code2 <= 0xD4D0 -> "Y"
-                            code2 >= 0xD4D1 && code2 <= 0xD7F9 -> "Z"
-                            else -> "#"
-                        }
-                    } else "#"
-                } catch (e: Exception) {
-                    "#"
+        return try {
+            val bytes = c.toString().toByteArray(Charset.forName("GBK"))
+            if (bytes.size == 2) {
+                val high = bytes[0].toInt() and 0xFF
+                val low = bytes[1].toInt() and 0xFF
+                val code = high * 256 + low
+                when {
+                    code >= 0xB0A1 && code <= 0xB0C4 -> "A"
+                    code >= 0xB0C5 && code <= 0xB2C0 -> "B"
+                    code >= 0xB2C1 && code <= 0xB4ED -> "C"
+                    code >= 0xB4EE && code <= 0xB6E9 -> "D"
+                    code >= 0xB6EA && code <= 0xB7A1 -> "E"
+                    code >= 0xB7A2 && code <= 0xB8C0 -> "F"
+                    code >= 0xB8C1 && code <= 0xB9FD -> "G"
+                    code >= 0xB9FE && code <= 0xBBF6 -> "H"
+                    code >= 0xBBF7 && code <= 0xBFA5 -> "J"
+                    code >= 0xBFA6 && code <= 0xC0AB -> "K"
+                    code >= 0xC0AC && code <= 0xC2E7 -> "L"
+                    code >= 0xC2E8 && code <= 0xC4C2 -> "M"
+                    code >= 0xC4C3 && code <= 0xC5B5 -> "N"
+                    code >= 0xC5B6 && code <= 0xC5BD -> "O"
+                    code >= 0xC5BE && code <= 0xC6D9 -> "P"
+                    code >= 0xC6DA && code <= 0xC8BA -> "Q"
+                    code >= 0xC8BB && code <= 0xC8F5 -> "R"
+                    code >= 0xC8F6 && code <= 0xCBF9 -> "S"
+                    code >= 0xCBFA && code <= 0xCDD9 -> "T"
+                    code >= 0xCDDA && code <= 0xCEF3 -> "W"
+                    code >= 0xCEF4 && code <= 0xD1B8 -> "X"
+                    code >= 0xD1B9 && code <= 0xD4D0 -> "Y"
+                    code >= 0xD4D1 && code <= 0xD7F9 -> "Z"
+                    else -> "#"
                 }
-            }
+            } else "#"
+        } catch (e: Exception) {
+            "#"
         }
     }
 }
