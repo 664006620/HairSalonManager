@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.hairsalon.manager.data.Member
 import com.hairsalon.manager.data.Transaction
@@ -58,7 +60,6 @@ fun MemberDetailScreen(
                     .padding(padding)
                     .fillMaxSize()
             ) {
-                // 余额卡片
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -100,7 +101,6 @@ fun MemberDetailScreen(
                     }
                 }
 
-                // 操作按钮
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,7 +134,6 @@ fun MemberDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 消费记录标题
                 Text(
                     text = "消费记录",
                     style = MaterialTheme.typography.titleMedium,
@@ -144,7 +143,6 @@ fun MemberDetailScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 交易记录列表
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -158,7 +156,6 @@ fun MemberDetailScreen(
         }
     }
 
-    // 充值对话框
     if (showChargeDialog) {
         ChargeDialog(
             title = "充值",
@@ -170,7 +167,6 @@ fun MemberDetailScreen(
         )
     }
 
-    // 扣费对话框
     if (showDeductDialog) {
         ChargeDialog(
             title = "扣费",
@@ -182,7 +178,6 @@ fun MemberDetailScreen(
         )
     }
 
-    // 编辑对话框
     if (showEditDialog && member != null) {
         EditMemberDialog(
             member = member!!,
