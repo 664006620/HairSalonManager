@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMemberDialog(
     onConfirm: (name: String, phone: String, level: String, remark: String) -> Unit,
@@ -59,7 +60,7 @@ fun AddMemberDialog(
                         FilterChip(
                             selected = level == l,
                             onClick = { level = l },
-                            label = { Text(l, fontSize = MaterialTheme.typography.labelSmall.fontSize) },
+                            label = { Text(l) },
                             modifier = Modifier.height(28.dp)
                         )
                     }
